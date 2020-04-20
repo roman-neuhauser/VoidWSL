@@ -1,0 +1,3 @@
+#!/bin/sh -eu
+
+exec docker run -v "$PWD:/w" -w /w builder "$@"
