@@ -12,7 +12,10 @@ TAR=bsdtar
 # Transaction aborted due to unresolved dependencies.
 # make: *** [Makefile:31: rootfs] Error 19
 
-BASE_URL=http://alpha.de.repo.voidlinux.org/live/20190526/void-x86_64-ROOTFS-20190526.tar.xz
+BASE_VER:=$(shell curl -sL http://alpha.de.repo.voidlinux.org/live/ | \
+	tr '< >' '\n' | grep -e 'href' | grep -v -e 'current' -e '.*asc' | \
+	sed -E 's|href="(.*)/"|\1|g' | sort | tail -n1)
+BASE_URL=http://alpha.de.repo.voidlinux.org/live/$(BASE_VER)/void-x86_64-ROOTFS-$(BASE_VER).tar.xz
 LNCR_ZIP_URL=https://github.com/yuk7/wsldl/releases/download/19022600/icons.zip
 
 all: Void.zip
@@ -33,7 +36,7 @@ icons.zip:
 
 rootfs.tar.gz: rootfs
 	@echo -e '\e[1;31mBuilding rootfs.tar.gz...\e[m'
-	sudo $(TAR) -czpf - > rootfs.tar.gz -C rootfs .
+	sudo $(TAR) -caf rootfs.tar.gz -C rootfs .
 
 rootfs: base.tar.xz
 	@echo -e '\e[1;31mBuilding rootfs...\e[m'
@@ -52,9 +55,9 @@ base.tar.xz:
 
 clean:
 	@echo -e '\e[1;31mCleaning files...\e[m'
-	rm -f Void.zip
-	rm -f Void.exe
-	rm -f icons.zip
-	rm -f rootfs.tar.gz
-	sudo rm -fr rootfs
-	rm -f base.tar.xz
+	-rm -f Void.zip
+	-rm -f Void.exe
+	-rm -f icons.zip
+	-rm -f rootfs.tar.gz
+	-sudo rm -fr rootfs
+	-rm -f base.tar.xz
